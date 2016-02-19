@@ -1,0 +1,165 @@
+---
+title: "Twitter Project Report"
+author: Adam Alagiah, Marc Antonius, Marie-Renee B-Lajoie, Kristina Koustopoulos
+output: html_document
+---
+<br>
+-------------------
+
+### INTRODUCTION
+During a political campaign, candidates are continually refining their messages to ensure that they are at the top of the polls. Social media - and particularly Twitter - has become an important medium for candidates to communicate with their electorate. This is particularly relevant for reaching young voters - in the 2014 presidential elections, only 22% of the US population aged between 18-29 voted. To engage the youth, politicians need to adapt their message but also their communication channels.
+
+In this report Twitter will be the primary data source for analysis and the following three areas are examined:
+<br>
+I.   Candidate usage of Twitter
+<br>
+II.  Candidate popularity on Twitter
+<br>
+III. Candidate language and message on Twitter
+
+The goal is to gain a better understanding of how leading presidential candidates are utilising Twitter, and how much success they are having in spreading their message. 
+
+
+<br>
+<br>
+<hr>
+
+
+### I. CANDIDATE USAGE OF TWITTER
+
+The first stage will be to get a clear understanding of which candidates are using Twitter more.
+
+**Hillary Clinton** tweeted `r nrow(twcan1)` times in the last week, **Donald Trump**  `r nrow(twcan2)` times, **Marco Rubio**  `r nrow(twcan3)` tweets, and **Bernie Sanders**  `r nrow(twcan4)` tweets in total.
+
+Below is a visualization of their tweeting over the past week:
+
+```{r echo=FALSE, comment=NA, results=FALSE, message=FALSE, fig.align='center', fig=TRUE, warning=FALSE}
+qplot(factor(screenName), data=twall, geom="bar", xlab="Candidate", ylab="tweet count")
+```
+
+<br>
+<br>
+<hr>
+
+
+### II. CANDIDATE POPULARITY ON TWITTER
+
+However, tweeting is not sufficient. To assess a candidate's influence in the twittersphere, being retweeted is what truly matters.  Tweets are more likely to be retweeted if the person tweeting has a large number of followers, uses a recognized hashtag, and sends messages emphasizing cohesion among followers or describing hazard impacts. 
+
+<br>
+
+#### RETWEETS OVER TIME
+
+```{r echo=FALSE, comment=NA, results=FALSE, message=FALSE, fig.align='center', fig=TRUE, warning=FALSE}
+plot1 <- ggplot(retweets, aes(x = day, y = retweets))
+plot1 + geom_line(aes(color=screenName, group=screenName))+ theme(axis.text.x  = element_text(angle=45, vjust=0.5))
+```
+
+<br>
+
+#### RETWEET HISTOGRAMS
+
+The following histograms highlight the number of retweets each of the candidate had in the last week:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, results=FALSE, message=FALSE, fig.align='center', fig=TRUE}
+Hist        <- hist(twcan1$retweetCount, breaks=nrow(twcan1), xlab="Number of Retweets", ylab="Number of Tweets", main="Hillary Clinton - Retweet Distribution", col="dark blue", border="dark blue")
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, results=FALSE, message=FALSE, fig.align='center', fig=TRUE}
+Hist        <- hist(twcan4$retweetCount, breaks=nrow(twcan4), xlab="Number of Retweets", ylab="Number of Tweets", main="Bernie Sanders - Retweet Distribution", col="blue", border="blue")
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, results=FALSE, message=FALSE, fig.align='center', fig=TRUE}
+Hist        <- hist(twcan2$retweetCount, breaks=nrow(twcan2), xlab="Number of Retweets", ylab="Number of Tweets", main="Donald Trump - Retweet Distribution", col="dark red", border="dark red")
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, results=FALSE, message=FALSE, fig.align='center', fig=TRUE}
+Hist        <- hist(twcan3$retweetCount, breaks=nrow(twcan3), xlab="Number of Retweets", ylab="Number of Tweets", main="Marco Rubio - Retweet Distribution", col="firebrick", border="firebrick")
+```
+
+So we can see that most tweets by the candidates are typically not retweeted often - i.e. they do not gain much attention. However, all the candidates have a small number of tweets that "go viral" and are retweeted many many times more than normal.
+
+We can also see that the most popular tweeters are Trump and Sanders, by some distance.
+
+<br>
+
+#### MENTIONS BY OTHERS
+
+The final way we can assess candidate popularity through Twitter is by the number of times they are mentioned in tweets by other Twitter users.
+
+The below chart shows how often twitter users refer to each of the 4 leading candidates. Bernie Sanders is ahead of all candidates. Throughout the race, young democrats has actively campaigned in favor of Bernie Sanders. Donald Trump, with his contreversial idealogies is ahead of Hillary Clinton.
+
+```{r echo=FALSE, comment=NA, warning=FALSE, results='asis', message=FALSE, fig.align='center', fig=TRUE}
+p5 <- ggplot(hashcount, aes(x = hour, y = x))
+p5 + geom_line(aes(color=hashtag, group=hashtag))+ theme(axis.text.x  = element_text(angle=45, vjust=0.5))
+```
+<br>
+<br>
+<hr>
+
+
+### III. CANDIDATE LANGUAGE AND MESSAGE ON TWITTER
+
+Finally, now that we have better understood which candidates are **using** Twitter, and which candidates are more **effective** on Twitter, it is important to assess **what** they are each saying on Twitter.
+
+One way of approaching this is to analyse the specific words that candidates are using in their tweets. All the candidates will mention obvious words like "White House" or "primaries" often, as well as generic words like "and", "the" or "a". However, what is interesting for us is to identify which words each candidate is using **relative to others**. 
+
+As such to identify which words candidates use relative to the others, we used calculated the relative percentage frequency difference across candidates for each word they used. 
+
+Below we present a wordcloud for each of the candidates, where the words are sized according to how frequently they are used by each candidate, relative to other candidates' usage of that word.
+
+
+```{r echo=FALSE, comment=NA, results=FALSE, message=FALSE, fig.align='center', fig=TRUE,fig.width=4, warning=FALSE}
+pal <- brewer.pal(9, "BuGn")
+pal <- pal[(4:9)]
+wc       <- wordcloud(allwords$word,allwords$can1diff, max.words=100, colors=pal)
+title("Hillary Clinton")
+```
+
+```{r echo=FALSE, comment=NA, results=FALSE, message=FALSE, fig.align='center', fig=TRUE,fig.width=4, warning=FALSE}
+wc       <- wordcloud(allwords$word,allwords$can4diff, max.words=100, colors=pal) 
+title("Bernie Sanders")
+```
+
+```{r echo=FALSE, comment=NA, results=FALSE, message=FALSE, fig.align='center', fig=TRUE,fig.width=4, warning=FALSE}
+wc       <- wordcloud(allwords$word,allwords$can2diff, max.words=100, colors=pal)
+title("Donald Trump")
+```
+
+```{r echo=FALSE, comment=NA, results=FALSE, message=FALSE, fig.align='center', fig=TRUE,fig.width=4, warning=FALSE}
+wc       <- wordcloud(allwords$word,allwords$can3diff, max.words=100, colors=pal) 
+title("Marco Rubio")
+```
+
+Reviewing these word clouds we can immediately see how candidates are positioning themselves. At the time of analysis, the following trends emerged:
+
++ Clinton focuses on core issues that will appeal to voters - "families", "violence", "obamacare" and "black" all feature heavily
++ By comparison, Sanders focuses more on change and the system - "change", "political", "revolution" and "need" are large
++ Trump's words focus on his vision for America's future - "makeamericagreatagain", "south" and "will" are frequently used
++ Rubio also does not focus on issues, rather appealing to voters' emotions - such as "proud", "welcome" or "support"
+
+At the same time, there are interesting patterns in how each candidate engages with votes:
+
++ Clinton, Sanders and Rubio do not mention either one another, nor any of their respective rivals, preferring to keep the focus on themselves "hillary" and "imwithher", or "bernie" and "feelthebern", or "marco" and "marcorubio" all prominent
++ On the other hand, while Trump does mention himself very often ("trump", "trump2016", and "therealdonaldtrump"), he also mentions his rivals often - "cruz", "ted", "bush" and "realbencarson" all appearing. This suggests he may be taking a more negative approach in his campaign, criticizing his rivals while also publicizing himself
+
+However, because we pull Twitter data dynamically, these will change constantly.
+
+<br>
+<br>
+<hr>
+
+
+### CONCLUSION
+
+In conclusion, we can see that despite the professionalisation of politics, and the ubiquity of election and communication consultants, there is still a wide range of approaches to using Twitter during elections. We have seen how some candidates use Twitter more, how others are more successful in getting publicity when they do tweet, and finally how each candidate uses Twitter to communicate in very different ways.
+
+As the election campaign progresses, monitoring how each candidate uses Twitter in gathering support will be important in understanding how and why candidates succeed or fail.
+
+
+<br>
+<br>
+<hr>
+
+
+
